@@ -57,6 +57,7 @@ def load_data():
     data_batch_3 = openPickle(data_batch_3_path)
     data_batch_4 = openPickle(data_batch_4_path)
     data_batch_5 = openPickle(data_batch_5_path)
+    test_batch = openPickle(test_batch_path)
 
     data1 = data_batch_1[b'data']
     labels1 = data_batch_1[b'labels']
@@ -68,6 +69,8 @@ def load_data():
     labels4 = data_batch_4[b'labels']
     data5 = data_batch_5[b'data']
     labels5 = data_batch_5[b'labels']
+    test_data = test_batch[b'data']
+    test_labels = test_batch[b'labels']
 
     #Join all datasets into a single one
     dataset = np.append(data1, data2, axis=0)
@@ -83,11 +86,26 @@ def load_data():
     #Reshape to 32x32x3 for use in our conv net
     dataset = dataset.reshape(-1, 3, 32, 32)
     dataset = dataset.transpose(0, 2, 3, 1)
+    labels = labels.reshape((-1, 1))
 
+    #Shuffle the dataset
+    dataset, labels = randomize(dataset, labels)
+    test_data, test_labels = randomize(test_data, test_labels)
 
+    #We create a validation set with an even distribution of each class
+    n_labels = 10
+    valid_index = np.zeros(labels.shape[0], dtype=bool)
+    
+    for i in np.arange(n_labels):
+        valid_index[(np.where(labels[:,0] == (i))[0][:250].tolist())] = True
 
+    valid_data = dataset[valid_index, :, :, :]
+    valid_labels = labels[valid_index]
+    train_labels = labels[~valid_index]
+    train_data = dataset[~valid_index,:,:,:]
 
-
+    savePickle((train_data, train_labels, valid_data, valid_labels, test_data, test_labels))
+    return (train_data, train_labels, valid_data, valid_labels, test_data, test_labels)
 
 
 def download_data(dest_folder, filename):
@@ -116,6 +134,13 @@ def download_progress_hook(count, blockSize, totalSize):
       sys.stdout.write(".")
       sys.stdout.flush()
     last_percent_reported = percent
+
+def randomize(dataset, labels):
+    np.random.seed(42) 
+    permutation = np.random.permutation(labels.shape[0])
+    shuffled_dataset = dataset[permutation,:,:,:]
+    shuffled_labels = labels[permutation]
+    return shuffled_dataset, shuffled_label
 
 
 load_data()
