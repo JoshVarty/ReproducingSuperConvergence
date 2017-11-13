@@ -19,7 +19,11 @@ print("Test data", test_data.shape)
 print("Test labels", test_labels.shape)
 
 
+
 def TrainModel(lr = 0.001):
+    
+    def accuracy(labels, predictions):
+        return (100.0 * np.sum(np.argmax(predictions, 1) == labels) / predictions.shape[0])
 
     def bias_variable(name, shape):
         return tf.get_variable(name, shape, initializer=tf.contrib.layers.xavier_initializer())
