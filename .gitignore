@@ -9,6 +9,7 @@
 *.userosscache
 *.sln.docstates
 
+input
 train/
 model/
 test/
