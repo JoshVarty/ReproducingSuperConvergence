@@ -2,7 +2,6 @@ import sys
 import pickle
 import os
 from six.moves.urllib.request import urlretrieve
-import matplotlib.pyplot as plt
 import tarfile
 import scipy.io
 import numpy as np
@@ -70,7 +69,7 @@ def load_data():
     data5 = data_batch_5[b'data']
     labels5 = data_batch_5[b'labels']
     test_data = test_batch[b'data']
-    test_labels = test_batch[b'labels']
+    test_labels = np.array(test_batch[b'labels'])
 
     #Join all datasets into a single one
     dataset = np.append(data1, data2, axis=0)
@@ -87,6 +86,9 @@ def load_data():
     dataset = dataset.reshape(-1, 3, 32, 32)
     dataset = dataset.transpose(0, 2, 3, 1)
     labels = labels.reshape((-1, 1))
+    test_data = test_data.reshape(-1, 3, 32, 32)
+    test_data = test_data.transpose(0, 2, 3, 1)
+    test_labels = test_labels.reshape((-1, 1))
 
     #Shuffle the dataset
     dataset, labels = randomize(dataset, labels)
@@ -104,7 +106,7 @@ def load_data():
     train_labels = labels[~valid_index]
     train_data = dataset[~valid_index,:,:,:]
 
-    savePickle((train_data, train_labels, valid_data, valid_labels, test_data, test_labels))
+    savePickle((train_data, train_labels, valid_data, valid_labels, test_data, test_labels), pickle_path)
     return (train_data, train_labels, valid_data, valid_labels, test_data, test_labels)
 
 
@@ -140,7 +142,5 @@ def randomize(dataset, labels):
     permutation = np.random.permutation(labels.shape[0])
     shuffled_dataset = dataset[permutation,:,:,:]
     shuffled_labels = labels[permutation]
-    return shuffled_dataset, shuffled_label
+    return shuffled_dataset, shuffled_labels
 
-
-load_data()
