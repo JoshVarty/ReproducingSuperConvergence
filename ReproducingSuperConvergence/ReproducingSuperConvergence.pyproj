@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>d3b47da5-c68e-4212-9736-0d9eaa487682</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>data_loader.py</StartupFile>
+    <StartupFile>model.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -26,6 +26,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="data_loader.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="model.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
