@@ -27,35 +27,34 @@ def TrainModel(lr = 0.001):
     def weight_layer(name, shape):
         return tf.get_variable(name, shape, initializer=tf.contrib.layers.xavier_initializer())
 
-    def identity_block(net, filters, stage, block):
+    def identity_block(net, num_channels, stage, block):
         weight_name_base = 'w' + str(stage) + block + '_branch'
         bias_name_base = 'b' + str(stage) + block + '_branch'
         conv_name_base = 'res' + str(stage) + block + '_branch'
         bn_name_base = 'bn' + str(stage) + block + '_branch'
 
-        F1, F2, F3 =  filters
         shortcut = net
 
         #First component of main path
         shape = net.shape.as_list()
-        weights = weight_layer(weight_name_base + '2a', [1, 1, shape[3], F1])
-        bias = bias_variable(bias_name_base + '2a', [F1])
+        weights = weight_layer(weight_name_base + '2a', [1, 1, shape[3], num_channels])
+        bias = bias_variable(bias_name_base + '2a', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='VALID', name=conv_name_base + '2a') + bias
         net = tf.layers.batch_normalization(net, name=bn_name_base + '2a')
         net = tf.nn.relu(net)
 
         #Second component of main path
         shape = net.shape.as_list()
-        weights = weight_layer(weight_name_base + '2b', [3, 3, shape[3], F2])
-        bias = bias_variable(bias_name_base + '2b', [F2])
+        weights = weight_layer(weight_name_base + '2b', [3, 3, shape[3], num_channels])
+        bias = bias_variable(bias_name_base + '2b', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='SAME', name=conv_name_base + '2b') + bias
         net = tf.layers.batch_normalization(net, name=bn_name_base + '2b')
         net = tf.nn.relu(net)
 
         #Third component of main path
         shape = net.shape.as_list()
-        weights = weight_layer(weight_name_base + '2c', [1, 1, shape[3], F3])
-        bias = bias_variable(bias_name_base + '2c', [F3])
+        weights = weight_layer(weight_name_base + '2c', [1, 1, shape[3], num_channels])
+        bias = bias_variable(bias_name_base + '2c', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='VALID', name=conv_name_base + '2c') + bias
         net = tf.layers.batch_normalization(net, name=bn_name_base + '2c')
 
@@ -65,42 +64,41 @@ def TrainModel(lr = 0.001):
 
         return net
 
-    def convolutional_block(net, filters, stage, block, stride=2):
+    def convolutional_block(net, num_channels, stage, block, stride=2):
         weight_name_base = 'w' + str(stage) + block + '_branch'
         bias_name_base = 'b' + str(stage) + block + '_branch'
         conv_name_base = 'res' + str(stage) + block + '_branch'
         bn_name_base = 'bn' + str(stage) + block + '_branch'
 
-        F1, F2, F3 =  filters
         shortcut = net
 
         #First component of main path
         shape = net.shape.as_list()
-        weights = weight_layer(weight_name_base + '2a', [1, 1, shape[3], F1])
-        bias = bias_variable(bias_name_base + '2a', [F1])
+        weights = weight_layer(weight_name_base + '2a', [1, 1, shape[3], num_channels])
+        bias = bias_variable(bias_name_base + '2a', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,stride,stride,1], padding='VALID', name=conv_name_base + '2a') + bias
         net = tf.layers.batch_normalization(net, name=bn_name_base + '2a')
         net = tf.nn.relu(net)
 
         #Second component of main path
         shape = net.shape.as_list()
-        weights = weight_layer(weight_name_base + '2b', [3, 3, shape[3], F2])
-        bias = bias_variable(bias_name_base + '2b', [F2])
+        weights = weight_layer(weight_name_base + '2b', [3, 3, shape[3], num_channels])
+        bias = bias_variable(bias_name_base + '2b', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='SAME', name=conv_name_base + '2b')
         net = tf.layers.batch_normalization(net, name=bn_name_base + '2b')
         net = tf.nn.relu(net)
 
         #Third component of main path
         shape = net.shape.as_list()
-        weights = weight_layer(weight_name_base + '2c', [1, 1, shape[3], F3])
-        bias = bias_variable(bias_name_base + '2c', [F3])
+        weights = weight_layer(weight_name_base + '2c', [1, 1, shape[3], num_channels * 2])
+        bias = bias_variable(bias_name_base + '2c', [num_channels * 2])
         net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='VALID', name=conv_name_base + '2c')
         net = tf.layers.batch_normalization(net, name=bn_name_base + '2c')
 
         #Shortcut path
         shape = shortcut.shape.as_list()
-        weights = weight_layer(weight_name_base + '1', [1, 1, shape[3], F3],)
-        bias = bias_variable(bias_name_base + '1', [F3])
+        weights = weight_layer(weight_name_base + '1', [1, 1, shape[3], num_channels * 2])
+        bias = bias_variable(bias_name_base + '1', [num_channels * 2])
         shortcut = tf.nn.conv2d(shortcut, weights, strides=[1, stride, stride, 1], padding='VALID', name=conv_name_base + '1')
         shortcut = tf.layers.batch_normalization(shortcut, name=bn_name_base + '1')
 
@@ -123,31 +121,36 @@ def TrainModel(lr = 0.001):
         net = tf.nn.conv2d(input, weights, strides=[1,1,1,1], padding='SAME') + bias
         net = tf.layers.batch_normalization(net, name="bn_conv1")
         net = tf.nn.relu(net)
-        net = tf.nn.max_pool(net, ksize=[1,3,3,1], strides=[1,2,2,1], padding='SAME')
         
         #Stage 2
-        net = convolutional_block(net, filters=[64, 64, 256], stage=2, block='a', stride=1)
-        net = identity_block(net, filters=[64, 64, 256], stage=2, block='b')
-        net = identity_block(net, filters=[64, 64, 256], stage=2, block='c')
+        net = identity_block(net, num_channels=16, stage=2, block='b')
+        net = identity_block(net, num_channels=16, stage=2, block='c')
+        net = identity_block(net, num_channels=16, stage=2, block='d')
+        net = identity_block(net, num_channels=16, stage=2, block='e')
+        net = identity_block(net, num_channels=16, stage=2, block='f')
+        net = identity_block(net, num_channels=16, stage=2, block='g')
+        net = identity_block(net, num_channels=16, stage=2, block='h')
+        net = identity_block(net, num_channels=16, stage=2, block='i')
 
         #Stage3
-        net = convolutional_block(net, filters=[128, 128, 512], stage=3, block='a', stride=2)
-        net = identity_block(net, filters=[128, 128, 512], stage=3, block='b')
-        net = identity_block(net, filters=[128, 128, 512], stage=3, block='c')
-        net = identity_block(net, filters=[128, 128, 512], stage=3, block='d')
+        net = convolutional_block(net, num_channels=16, stage=3, block='a', stride=2)
+        net = identity_block(net, num_channels=32, stage=3, block='b')
+        net = identity_block(net, num_channels=32, stage=3, block='c')
+        net = identity_block(net, num_channels=32, stage=3, block='d')
+        net = identity_block(net, num_channels=32, stage=3, block='e')
+        net = identity_block(net, num_channels=32, stage=3, block='f')
+        net = identity_block(net, num_channels=32, stage=3, block='g')
+        net = identity_block(net, num_channels=32, stage=3, block='h')
 
         #Stage4
-        net = convolutional_block(net, filters=[256, 256, 1024], stage=4, block='a', stride=2)
-        net = identity_block(net, filters=[256, 256, 1024], stage=4, block='b')
-        net = identity_block(net, filters=[256, 256, 1024], stage=4, block='c')
-        net = identity_block(net, filters=[256, 256, 1024], stage=4, block='d')
-        net = identity_block(net, filters=[256, 256, 1024], stage=4, block='e')
-        net = identity_block(net, filters=[256, 256, 1024], stage=4, block='f')
-
-        #Stage5
-        net = convolutional_block(net, filters=[512, 512, 2048], stage=5, block='a', stride=2)
-        net = identity_block(net, filters=[512, 512, 2048], stage=5, block='b')
-        net = identity_block(net, filters=[512, 512, 2048], stage=5, block='c')
+        net = convolutional_block(net, num_channels=32, stage=4, block='a', stride=2)
+        net = identity_block(net, num_channels=64, stage=4, block='b')
+        net = identity_block(net, num_channels=64, stage=4, block='c')
+        net = identity_block(net, num_channels=64, stage=4, block='d')
+        net = identity_block(net, num_channels=64, stage=4, block='e')
+        net = identity_block(net, num_channels=64, stage=4, block='f')
+        net = identity_block(net, num_channels=64, stage=4, block='g')
+        net = identity_block(net, num_channels=64, stage=4, block='h')
 
         net = tf.nn.avg_pool(net, ksize=[1,2,2,1], strides=[1,1,1,1], padding='VALID')
         shape = net.shape.as_list()
