@@ -72,42 +72,30 @@ def load_data():
     test_labels = np.array(test_batch[b'labels'])
 
     #Join all datasets into a single one
-    dataset = np.append(data1, data2, axis=0)
-    dataset = np.append(dataset, data3, axis=0)
-    dataset = np.append(dataset, data4, axis=0)
-    dataset = np.append(dataset, data5, axis=0)
+    train_data = np.append(data1, data2, axis=0)
+    train_data = np.append(train_data, data3, axis=0)
+    train_data = np.append(train_data, data4, axis=0)
+    train_data = np.append(train_data, data5, axis=0)
     
-    labels = np.append(labels1, labels2, axis=0)
-    labels = np.append(labels, labels3, axis=0)
-    labels = np.append(labels, labels4, axis=0)
-    labels = np.append(labels, labels5, axis=0)
+    train_labels = np.append(labels1, labels2, axis=0)
+    train_labels = np.append(train_labels, labels3, axis=0)
+    train_labels = np.append(train_labels, labels4, axis=0)
+    train_labels = np.append(train_labels, labels5, axis=0)
 
     #Reshape to 32x32x3 for use in our conv net
-    dataset = dataset.reshape(-1, 3, 32, 32)
-    dataset = dataset.transpose(0, 2, 3, 1)
-    labels = labels.reshape((-1, 1))
+    train_data = train_data.reshape(-1, 3, 32, 32)
+    train_data = train_data.transpose(0, 2, 3, 1)
+    train_labels = train_labels.reshape((-1, 1))
     test_data = test_data.reshape(-1, 3, 32, 32)
     test_data = test_data.transpose(0, 2, 3, 1)
     test_labels = test_labels.reshape((-1, 1))
 
     #Shuffle the dataset
-    dataset, labels = randomize(dataset, labels)
+    train_data, train_labels = randomize(train_data, train_labels)
     test_data, test_labels = randomize(test_data, test_labels)
 
-    #We create a validation set with an even distribution of each class
-    n_labels = 10
-    valid_index = np.zeros(labels.shape[0], dtype=bool)
-    
-    for i in np.arange(n_labels):
-        valid_index[(np.where(labels[:,0] == (i))[0][:250].tolist())] = True
-
-    valid_data = dataset[valid_index, :, :, :]
-    valid_labels = labels[valid_index]
-    train_labels = labels[~valid_index]
-    train_data = dataset[~valid_index,:,:,:]
-
-    savePickle((train_data, train_labels, valid_data, valid_labels, test_data, test_labels), pickle_path)
-    return (train_data, train_labels, valid_data, valid_labels, test_data, test_labels)
+    savePickle((train_data, train_labels, test_data, test_labels), pickle_path)
+    return (train_data, train_labels, test_data, test_labels)
 
 
 def download_data(dest_folder, filename):

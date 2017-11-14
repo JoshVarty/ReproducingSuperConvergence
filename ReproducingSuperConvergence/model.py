@@ -9,16 +9,12 @@ num_channels = 3
 pixel_depth = 255
 num_labels = 10
 
-train_data, train_labels, valid_data, valid_labels, test_data, test_labels = data_loader.load_data()
+train_data, train_labels, test_data, test_labels = data_loader.load_data()
 
 print("Train data", train_data.shape)
 print("Train labels", train_labels.shape)
-print("Valid data", valid_data.shape)
-print("Valid labels", valid_labels.shape)
 print("Test data", test_data.shape)
 print("Test labels", test_labels.shape)
-
-
 
 def TrainModel(lr = 0.001):
     
@@ -172,7 +168,7 @@ def TrainModel(lr = 0.001):
             merged = tf.summary.merge_all()
             writer = tf.summary.FileWriter("/tmp/svhn_single")
             writer.add_graph(session.graph)
-            num_steps = 60000
+            num_steps = 30000
             batch_size = 64
             tf.global_variables_initializer().run()
             for step in range(num_steps):
@@ -189,38 +185,16 @@ def TrainModel(lr = 0.001):
                     _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
                     print('Minibatch loss at step %d: %f' % (step, l))
                     print('Minibatch accuracy: %.1f%%' % accuracy(batch_labels, predictions)) 
-                    #Validation
-
-                    v_steps = 10
-                    v_batch_size = int(valid_data.shape[0] / v_steps)
-                    v_preds = np.zeros((valid_labels.shape[0], num_digits))
-                    for v_step in range(v_steps):
-                        v_offset = (v_step * v_batch_size) 
-                        v_batch_data = valid_data[v_offset:(v_offset + v_batch_size), :, :]
-                        v_batch_labels = np.squeeze(valid_labels[v_offset:(v_offset + v_batch_size),:])
-
-                        feed_dict = {input : v_batch_data, labels : v_batch_labels, learning_rate: lr}
-                        l, predictions = session.run([cost, train_prediction], feed_dict=feed_dict)
-                        v_preds[v_offset: v_offset + predictions.shape[0],:] = predictions
-
-                    #If we missed any validation images at the end, process them now
-                    if v_steps * v_batch_size < valid_data.shape[0]:
-                        v_offset = (v_steps * v_batch_size) 
-                        v_batch_data = valid_data[v_offset:valid_data.shape[0] , :, :, :]
-                        v_batch_labels = np.squeeze(valid_labels[v_offset:valid_data.shape[0],:])
-
-                        feed_dict = {input : v_batch_data, labels : v_batch_labels, learning_rate: lr}
-                        l, predictions, = session.run([total_cost, train_prediction], feed_dict=feed_dict)
-                        v_preds[v_offset: v_offset + predictions.shape[0],:] = predictions
-
-                    print('Valid accuracy: %.1f%%' % accuracy(np.squeeze(valid_labels), v_preds))
-
                 if step % 100 == 0:
                     _, l, predictions, m = session.run([optimizer, cost, train_prediction, merged], feed_dict=feed_dict)
                     writer.add_summary(m, step)
                 else:
                     _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
 
+            #See test set performance
+            feed_dict = {input : test_data, labels : test_labels, learning_rate: lr} 
+            _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
+            print('Test accuracy: %.1f%%' % accuracy(batch_labels, predictions)) 
 
 if __name__ == '__main__':
     TrainModel()
