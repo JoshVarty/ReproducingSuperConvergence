@@ -185,17 +185,6 @@ def TrainModel(lr = 0.001):
                     _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
                     print('Minibatch loss at step %d: %f' % (step, l))
                     print('Minibatch accuracy: %.1f%%' % accuracy(batch_labels, predictions)) 
-                    #See test set performance
-
-                    accuracySum = 0
-                    for i in range(0, len(test_data), int(len(test_data) / 10)):
-                        print("Low:", i, "High:", i + len(test_data) / 10)
-                        feed_dict = {input : test_data, labels : test_labels, learning_rate: lr} 
-                        _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
-                        currentAccuracy = accuracy(test_labels, predictions)
-                        accuracySum = accuracySum + currentAccuracy
-
-                    print('Test accuracy: %.1f%%' % accuracySum / 10) 
 
                 if step % 100 == 0:
                     _, l, predictions, m = session.run([optimizer, cost, train_prediction, merged], feed_dict=feed_dict)
@@ -203,7 +192,20 @@ def TrainModel(lr = 0.001):
                 else:
                     _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
 
-            
+            #See test set performance
+
+            accuracySum = 0.0
+            for i in range(0, len(test_data), int(len(test_data) / 10)):
+                print("Low:", i, "High:", i + len(test_data) / 10)
+                batch_data = test_data[i:i + int(len(test_data) / 10)]
+                batch_labels = np.squeeze(test_labels[i:i + int(len(test_data) / 10)])
+                feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr} 
+                _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
+                currentAccuracy = accuracy(batch_labels, predictions)
+                accuracySum = accuracySum + currentAccuracy
+
+            print('Test accuracy: %.1f%%' % (accuracySum / 10))
+        
 
 if __name__ == '__main__':
     TrainModel()
