@@ -44,7 +44,7 @@ def TrainModel(lr = 0.001):
         weights = weight_layer(weight_name_base + '2a', [3, 3, shape[3], num_channels])
         bias = bias_variable(bias_name_base + '2a', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='SAME', name=conv_name_base + '2a') + bias
-        net = tf.layers.batch_normalization(net, name=bn_name_base + '2a')
+        net = tf.layers.batch_normalization(net, name=bn_name_base + '2a', momentum=0.95)
         net = tf.nn.relu(net)
 
         #ConvLayer2
@@ -56,7 +56,7 @@ def TrainModel(lr = 0.001):
         weights = weight_layer(weight_name_base + '2b', [3, 3, shape[3], num_channels])
         bias = bias_variable(bias_name_base + '2b', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='SAME', name=conv_name_base + '2b') + bias
-        net = tf.layers.batch_normalization(net, name=bn_name_base + '2b')
+        net = tf.layers.batch_normalization(net, name=bn_name_base + '2b', momentum=0.95)
 
         #Final step: Add shortcut value to main path
         net = tf.add(net, shortcut)
@@ -81,7 +81,7 @@ def TrainModel(lr = 0.001):
         weights = weight_layer(weight_name_base + '2a', [3, 3, shape[3], num_channels])
         bias = bias_variable(bias_name_base + '2a', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,2,2,1], padding='SAME', name=conv_name_base + '2a')
-        net = tf.layers.batch_normalization(net, name=bn_name_base + '2a')
+        net = tf.layers.batch_normalization(net, name=bn_name_base + '2a', momentum=0.95)
         net = tf.nn.relu(net)
 
         #ConvLayer2
@@ -93,7 +93,7 @@ def TrainModel(lr = 0.001):
         weights = weight_layer(weight_name_base + '2b', [3, 3, shape[3], num_channels])
         bias = bias_variable(bias_name_base + '2b', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='SAME', name=conv_name_base + '2b')
-        net = tf.layers.batch_normalization(net, name=bn_name_base + '2b')
+        net = tf.layers.batch_normalization(net, name=bn_name_base + '2b', momentum=0.95)
 
         #Avg Pool (of shortcut)
         #   padding     0   ("VALID") 
@@ -122,7 +122,7 @@ def TrainModel(lr = 0.001):
         weights = weight_layer("w_conv1", [3, 3, shape[3], 16])
         bias = bias_variable("b_conv1", [16])
         net = tf.nn.conv2d(input, weights, strides=[1,1,1,1], padding='SAME') + bias
-        net = tf.layers.batch_normalization(net, name="bn_conv1")
+        net = tf.layers.batch_normalization(net, name="bn_conv1", momentum=0.95)
         net = tf.nn.relu(net)
         
         #Stage 2
