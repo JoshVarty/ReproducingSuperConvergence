@@ -152,7 +152,7 @@ def TrainModel(lr = 0.001):
         net = identity_block(net, num_channels=64, stage=4, block='g')
         net = identity_block(net, num_channels=64, stage=4, block='h')
 
-        net = tf.nn.avg_pool(net, ksize=[1,2,2,1], strides=[1,1,1,1], padding='VALID')
+        net = tf.nn.avg_pool(net, ksize=[1,8,8,1], strides=[1,1,1,1], padding='VALID')
         shape = net.shape.as_list()
         reshape = tf.reshape(net, [-1, shape[3]])
 
