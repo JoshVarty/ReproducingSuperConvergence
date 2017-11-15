@@ -72,39 +72,42 @@ def TrainModel(lr = 0.001):
 
         shortcut = net
 
-        #First component of main path
+        #ConvLayer1
+        #   padding     1   ("SAME") 
+        #   kernel      3x3
+        #   stride      2
+        #   channels    num_channels
         shape = net.shape.as_list()
-        weights = weight_layer(weight_name_base + '2a', [1, 1, shape[3], num_channels])
+        weights = weight_layer(weight_name_base + '2a', [3, 3, shape[3], num_channels])
         bias = bias_variable(bias_name_base + '2a', [num_channels])
-        net = tf.nn.conv2d(net, weights, strides=[1,stride,stride,1], padding='VALID', name=conv_name_base + '2a') + bias
+        net = tf.nn.conv2d(net, weights, strides=[1,2,2,1], padding='SAME', name=conv_name_base + '2a')
         net = tf.layers.batch_normalization(net, name=bn_name_base + '2a')
         net = tf.nn.relu(net)
 
-        #Second component of main path
+        #ConvLayer2
+        #   padding     1   ("SAME") 
+        #   kernel      3x3
+        #   stride      1
+        #   channels    num_channels
         shape = net.shape.as_list()
         weights = weight_layer(weight_name_base + '2b', [3, 3, shape[3], num_channels])
         bias = bias_variable(bias_name_base + '2b', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='SAME', name=conv_name_base + '2b')
         net = tf.layers.batch_normalization(net, name=bn_name_base + '2b')
-        net = tf.nn.relu(net)
 
-        #Third component of main path
-        shape = net.shape.as_list()
-        weights = weight_layer(weight_name_base + '2c', [1, 1, shape[3], num_channels * 2])
-        bias = bias_variable(bias_name_base + '2c', [num_channels * 2])
-        net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='VALID', name=conv_name_base + '2c')
-        net = tf.layers.batch_normalization(net, name=bn_name_base + '2c')
-
-        #Shortcut path
-        shape = shortcut.shape.as_list()
-        weights = weight_layer(weight_name_base + '1', [1, 1, shape[3], num_channels * 2])
-        bias = bias_variable(bias_name_base + '1', [num_channels * 2])
-        shortcut = tf.nn.conv2d(shortcut, weights, strides=[1, stride, stride, 1], padding='VALID', name=conv_name_base + '1')
-        shortcut = tf.layers.batch_normalization(shortcut, name=bn_name_base + '1')
-
+        #Avg Pool (of shortcut)
+        #   padding     0   ("VALID") 
+        #   kernel      3x3
+        #   stride      2
+        shortcut = tf.nn.avg_pool(shortcut, ksize=[1,2,2,1], strides=[1,2,2,1], padding='VALID')
+        
         #Add shortcut to main path
         net = tf.add(shortcut, net)
         net = tf.nn.relu(net)
+
+        #Concatenate with zeros
+        zeros = tf.zeros_like(net)
+        net = tf.concat([net, zeros], axis=3)
 
         return net
 
