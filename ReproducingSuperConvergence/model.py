@@ -175,7 +175,7 @@ def TrainModel(lr = 0.001):
             writer = tf.summary.FileWriter("/tmp/svhn_single")
             writer.add_graph(session.graph)
             num_steps = 30000
-            batch_size = 64
+            batch_size = 128
             tf.global_variables_initializer().run()
             for step in range(num_steps):
                 offset = (step * batch_size) % (train_labels.shape[0] - batch_size)
@@ -183,9 +183,6 @@ def TrainModel(lr = 0.001):
                 batch_labels = np.squeeze(train_labels[offset:(offset + batch_size), :])
 
                 feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr} 
-
-                if step % 10000 == 0:
-                    lr = lr / 2
 
                 if step % 500 == 0:
                     _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
