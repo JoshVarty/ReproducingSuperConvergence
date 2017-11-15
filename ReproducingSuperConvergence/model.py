@@ -36,25 +36,25 @@ def TrainModel(lr = 0.001):
         shortcut = net
 
         #ConvLayer1
-        #   padding     1   ("Same") 
+        #   padding     1   ("SAME") 
+        #   kernel      3x3
+        #   stride      1
+        #   channels    num_channels
+        shape = net.shape.as_list()
+        weights = weight_layer(weight_name_base + '2a', [3, 3, shape[3], num_channels])
+        bias = bias_variable(bias_name_base + '2a', [num_channels])
+        net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='SAME', name=conv_name_base + '2a') + bias
+        net = tf.layers.batch_normalization(net, name=bn_name_base + '2a')
+        net = tf.nn.relu(net)
+
+        #ConvLayer2
+        #   padding     1   ("SAME") 
         #   kernel      3x3
         #   stride      1
         #   channels    num_channels
         shape = net.shape.as_list()
         weights = weight_layer(weight_name_base + '2b', [3, 3, shape[3], num_channels])
         bias = bias_variable(bias_name_base + '2b', [num_channels])
-        net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='SAME', name=conv_name_base + '2a') + bias
-        net = tf.layers.batch_normalization(net, name=bn_name_base + '2a')
-        net = tf.nn.relu(net)
-
-        #ConvLayer2
-        #   padding     1   ("Same") 
-        #   kernel      3x3
-        #   stride      1
-        #   channels    num_channels
-        shape = net.shape.as_list()
-        weights = weight_layer(weight_name_base + '2c', [3, 3, shape[3], num_channels])
-        bias = bias_variable(bias_name_base + '2c', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='SAME', name=conv_name_base + '2b') + bias
         net = tf.layers.batch_normalization(net, name=bn_name_base + '2b')
 
