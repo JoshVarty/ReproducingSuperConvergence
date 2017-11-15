@@ -27,7 +27,7 @@ def TrainModel(lr = 0.001):
     def weight_layer(name, shape):
         return tf.get_variable(name, shape, initializer=tf.contrib.layers.xavier_initializer())
 
-    def identity_block(net, num_channels, stage, block):
+    def residual_block(net, num_channels, stage, block):
         weight_name_base = 'w' + str(stage) + block + '_branch'
         bias_name_base = 'b' + str(stage) + block + '_branch'
         conv_name_base = 'res' + str(stage) + block + '_branch'
@@ -64,7 +64,7 @@ def TrainModel(lr = 0.001):
 
         return net
 
-    def convolutional_block(net, num_channels, stage, block, stride=2):
+    def downsample_block(net, num_channels, stage, block, stride=2):
         weight_name_base = 'w' + str(stage) + block + '_branch'
         bias_name_base = 'b' + str(stage) + block + '_branch'
         conv_name_base = 'res' + str(stage) + block + '_branch'
@@ -123,34 +123,34 @@ def TrainModel(lr = 0.001):
         net = tf.nn.relu(net)
         
         #Stage 2
-        net = identity_block(net, num_channels=16, stage=2, block='b')
-        net = identity_block(net, num_channels=16, stage=2, block='c')
-        net = identity_block(net, num_channels=16, stage=2, block='d')
-        net = identity_block(net, num_channels=16, stage=2, block='e')
-        net = identity_block(net, num_channels=16, stage=2, block='f')
-        net = identity_block(net, num_channels=16, stage=2, block='g')
-        net = identity_block(net, num_channels=16, stage=2, block='h')
-        net = identity_block(net, num_channels=16, stage=2, block='i')
+        net = residual_block(net, num_channels=16, stage=2, block='b')
+        net = residual_block(net, num_channels=16, stage=2, block='c')
+        net = residual_block(net, num_channels=16, stage=2, block='d')
+        net = residual_block(net, num_channels=16, stage=2, block='e')
+        net = residual_block(net, num_channels=16, stage=2, block='f')
+        net = residual_block(net, num_channels=16, stage=2, block='g')
+        net = residual_block(net, num_channels=16, stage=2, block='h')
+        net = residual_block(net, num_channels=16, stage=2, block='i')
 
         #Stage3
-        net = convolutional_block(net, num_channels=16, stage=3, block='a', stride=2)
-        net = identity_block(net, num_channels=32, stage=3, block='b')
-        net = identity_block(net, num_channels=32, stage=3, block='c')
-        net = identity_block(net, num_channels=32, stage=3, block='d')
-        net = identity_block(net, num_channels=32, stage=3, block='e')
-        net = identity_block(net, num_channels=32, stage=3, block='f')
-        net = identity_block(net, num_channels=32, stage=3, block='g')
-        net = identity_block(net, num_channels=32, stage=3, block='h')
+        net = downsample_block(net, num_channels=16, stage=3, block='a', stride=2)
+        net = residual_block(net, num_channels=32, stage=3, block='b')
+        net = residual_block(net, num_channels=32, stage=3, block='c')
+        net = residual_block(net, num_channels=32, stage=3, block='d')
+        net = residual_block(net, num_channels=32, stage=3, block='e')
+        net = residual_block(net, num_channels=32, stage=3, block='f')
+        net = residual_block(net, num_channels=32, stage=3, block='g')
+        net = residual_block(net, num_channels=32, stage=3, block='h')
 
         #Stage4
-        net = convolutional_block(net, num_channels=32, stage=4, block='a', stride=2)
-        net = identity_block(net, num_channels=64, stage=4, block='b')
-        net = identity_block(net, num_channels=64, stage=4, block='c')
-        net = identity_block(net, num_channels=64, stage=4, block='d')
-        net = identity_block(net, num_channels=64, stage=4, block='e')
-        net = identity_block(net, num_channels=64, stage=4, block='f')
-        net = identity_block(net, num_channels=64, stage=4, block='g')
-        net = identity_block(net, num_channels=64, stage=4, block='h')
+        net = downsample_block(net, num_channels=32, stage=4, block='a', stride=2)
+        net = residual_block(net, num_channels=64, stage=4, block='b')
+        net = residual_block(net, num_channels=64, stage=4, block='c')
+        net = residual_block(net, num_channels=64, stage=4, block='d')
+        net = residual_block(net, num_channels=64, stage=4, block='e')
+        net = residual_block(net, num_channels=64, stage=4, block='f')
+        net = residual_block(net, num_channels=64, stage=4, block='g')
+        net = residual_block(net, num_channels=64, stage=4, block='h')
 
         net = tf.nn.avg_pool(net, ksize=[1,8,8,1], strides=[1,1,1,1], padding='VALID')
         shape = net.shape.as_list()
