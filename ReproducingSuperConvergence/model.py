@@ -168,7 +168,9 @@ def TrainModel(lr = 0.001):
 
         train_prediction = tf.nn.softmax(logits)
 
-        optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
+        update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        with tf.control_dependencies(update_ops):
+            optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
         with tf.Session(graph=graph) as session:
             merged = tf.summary.merge_all()
