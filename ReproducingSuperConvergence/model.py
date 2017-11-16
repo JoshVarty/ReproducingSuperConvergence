@@ -126,6 +126,8 @@ def TrainModel(lr = 0.001):
         net = tf.nn.relu(net)
         
         #Stage 2
+        #RestNet Standard Block x9
+        net = residual_block(net, num_channels=16, stage=2, block='a')
         net = residual_block(net, num_channels=16, stage=2, block='b')
         net = residual_block(net, num_channels=16, stage=2, block='c')
         net = residual_block(net, num_channels=16, stage=2, block='d')
@@ -136,7 +138,9 @@ def TrainModel(lr = 0.001):
         net = residual_block(net, num_channels=16, stage=2, block='i')
 
         #Stage3
+        #ResNet Downsample Block
         net = downsample_block(net, num_channels=16, stage=3, block='a', stride=2)
+        #ResNet Standard Block x8
         net = residual_block(net, num_channels=32, stage=3, block='b')
         net = residual_block(net, num_channels=32, stage=3, block='c')
         net = residual_block(net, num_channels=32, stage=3, block='d')
@@ -144,9 +148,12 @@ def TrainModel(lr = 0.001):
         net = residual_block(net, num_channels=32, stage=3, block='f')
         net = residual_block(net, num_channels=32, stage=3, block='g')
         net = residual_block(net, num_channels=32, stage=3, block='h')
+        net = residual_block(net, num_channels=32, stage=3, block='i')
 
         #Stage4
+        #ResNet Downsample Block
         net = downsample_block(net, num_channels=32, stage=4, block='a', stride=2)
+        #ResNet Standard Block x8
         net = residual_block(net, num_channels=64, stage=4, block='b')
         net = residual_block(net, num_channels=64, stage=4, block='c')
         net = residual_block(net, num_channels=64, stage=4, block='d')
@@ -154,6 +161,7 @@ def TrainModel(lr = 0.001):
         net = residual_block(net, num_channels=64, stage=4, block='f')
         net = residual_block(net, num_channels=64, stage=4, block='g')
         net = residual_block(net, num_channels=64, stage=4, block='h')
+        net = residual_block(net, num_channels=64, stage=4, block='i')
 
         net = tf.nn.avg_pool(net, ksize=[1,8,8,1], strides=[1,1,1,1], padding='VALID')
         shape = net.shape.as_list()
