@@ -117,11 +117,11 @@ def TrainModel(lr = 0.001):
         labels = tf.placeholder(tf.int32, shape=(None), name="labels")
         learning_rate = tf.placeholder(tf.float32, shape=(), name="learning_rate")
 
-        #Replacing 7x7 Conv->MaxPool with 3x3 Conv due to size
+        #Stage 1
         shape = input.shape.as_list()
         weights = weight_layer("w_conv1", [3, 3, shape[3], 16])
         bias = bias_variable("b_conv1", [16])
-        net = tf.nn.conv2d(input, weights, strides=[1,1,1,1], padding='SAME') + bias
+        net = tf.nn.conv2d(input, weights, strides=[1,2,2,1], padding='SAME') + bias
         net = tf.layers.batch_normalization(net, name="bn_conv1", momentum=0.95)
         net = tf.nn.relu(net)
         
