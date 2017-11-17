@@ -22,10 +22,10 @@ def TrainModel(lr = 0.001):
         return (100.0 * np.sum(np.argmax(predictions, 1) == labels) / predictions.shape[0])
 
     def bias_variable(name, shape):
-        return tf.get_variable(name, shape, initializer=tf.contrib.layers.xavier_initializer())
+        return tf.get_variable(name, shape, initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0, uniform=False))
 
     def weight_layer(name, shape):
-        return tf.get_variable(name, shape, initializer=tf.contrib.layers.xavier_initializer())
+        return tf.get_variable(name, shape, initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0, uniform=False))
 
     def residual_block(net, num_channels, stage, block):
         weight_name_base = 'w' + str(stage) + block + '_branch'
