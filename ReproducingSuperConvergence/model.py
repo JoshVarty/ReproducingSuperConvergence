@@ -16,7 +16,7 @@ print("Train labels", train_labels.shape)
 print("Test data", test_data.shape)
 print("Test labels", test_labels.shape)
 
-def TrainModel(lr = 0.001):
+def TrainModel(lr = 0.1):
     
     def accuracy(labels, predictions):
         return (100.0 * np.sum(np.argmax(predictions, 1) == labels) / predictions.shape[0])
@@ -178,7 +178,7 @@ def TrainModel(lr = 0.001):
 
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(update_ops):
-            optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
+            optimizer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost)
 
         with tf.Session(graph=graph) as session:
             merged = tf.summary.merge_all()
