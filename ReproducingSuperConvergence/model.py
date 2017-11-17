@@ -22,7 +22,7 @@ def TrainModel(lr = 0.001):
         return (100.0 * np.sum(np.argmax(predictions, 1) == labels) / predictions.shape[0])
 
     def bias_variable(name, shape):
-        return tf.get_variable(name, shape, initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0, uniform=False))
+        return tf.get_variable(name, shape, initializer=tf.constant_initializer(0))
 
     def weight_layer(name, shape):
         return tf.get_variable(name, shape, initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0, uniform=False))
