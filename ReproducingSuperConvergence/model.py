@@ -110,12 +110,25 @@ def TrainModel(lr = 0.1):
         net = tf.concat([net, zeros], axis=3)
 
         return net
+    
+    def random_flip_left_right(input):
+        batch = tf.shape(input)[0]
+        uniform_random = tf.random_uniform([batch], 0, 1.0)
+        mirror_cond = tf.less(uniform_random, 0.5)
+        result = tf.where(mirror_cond, x=input, y=tf.reverse(input, [2]))
+        return result
 
     graph = tf.Graph()
     with graph.as_default():
         input = tf.placeholder(tf.float32, shape=(None, image_size, image_size, num_channels), name="input")
         labels = tf.placeholder(tf.int32, shape=(None), name="labels")
+        is_training = tf.placeholder(tf.bool, name='is_training')
         learning_rate = tf.placeholder(tf.float32, shape=(), name="learning_rate")
+
+        #If we're training, randomly flip the image
+        input = tf.cond(is_training,
+                                 lambda: random_flip_left_right(input),
+                                 lambda: input)
 
         #Stage 1
         shape = input.shape.as_list()
@@ -192,7 +205,7 @@ def TrainModel(lr = 0.1):
                 batch_data = train_data[offset:(offset + batch_size), :, :]
                 batch_labels = np.squeeze(train_labels[offset:(offset + batch_size), :])
 
-                feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr} 
+                feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: True} 
 
                 if step % 500 == 0:
                     _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
@@ -206,12 +219,11 @@ def TrainModel(lr = 0.1):
                     _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
 
             #See test set performance
-
             accuracySum = 0.0
             for i in range(0, len(test_data), int(len(test_data) / 10)):
                 batch_data = test_data[i:i + int(len(test_data) / 10)]
                 batch_labels = np.squeeze(test_labels[i:i + int(len(test_data) / 10)])
-                feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr} 
+                feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: False} 
                 _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
                 currentAccuracy = accuracy(batch_labels, predictions)
                 accuracySum = accuracySum + currentAccuracy
