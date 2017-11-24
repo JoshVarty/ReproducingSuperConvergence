@@ -124,8 +124,11 @@ def TrainModel(lr = 0.1):
         input = tf.placeholder(tf.float32, shape=(None, image_size, image_size, num_channels), name="input")
         labels = tf.placeholder(tf.int32, shape=(None), name="labels")
         is_training = tf.placeholder(tf.bool, name='is_training')
+        mean_image_tf = tf.constant(mean_image, dtype=tf.float32)
         learning_rate = tf.placeholder(tf.float32, shape=(), name="learning_rate")
 
+
+        input = tf.subtract(input, mean_image_tf)
         #If we're training, randomly flip the image
         input = tf.cond(is_training,
                                  lambda: random_flip_left_right(input),
