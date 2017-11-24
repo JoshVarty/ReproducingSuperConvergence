@@ -94,8 +94,11 @@ def load_data():
     train_data, train_labels = randomize(train_data, train_labels)
     test_data, test_labels = randomize(test_data, test_labels)
 
-    savePickle((train_data, train_labels, test_data, test_labels), pickle_path)
-    return (train_data, train_labels, test_data, test_labels)
+    #Compute mean image of training data
+    mean_image = np.mean(train_data, axis=0)
+
+    savePickle((train_data, train_labels, test_data, test_labels, mean_image), pickle_path)
+    return (train_data, train_labels, test_data, test_labels, mean_image)
 
 
 def download_data(dest_folder, filename):

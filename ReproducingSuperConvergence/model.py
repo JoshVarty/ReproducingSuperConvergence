@@ -9,12 +9,13 @@ num_channels = 3
 pixel_depth = 255
 num_labels = 10
 
-train_data, train_labels, test_data, test_labels = data_loader.load_data()
+train_data, train_labels, test_data, test_labels, mean_image = data_loader.load_data()
 
 print("Train data", train_data.shape)
 print("Train labels", train_labels.shape)
 print("Test data", test_data.shape)
 print("Test labels", test_labels.shape)
+print("Mean Image (training)", mean_image.shape)
 
 def TrainModel(lr = 0.1):
     
