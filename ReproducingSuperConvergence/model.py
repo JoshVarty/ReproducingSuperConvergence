@@ -197,14 +197,19 @@ def TrainModel(lr = 0.1, augment_data = True):
         logits = tf.matmul(reshape, weight) + bias
 
         cost = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=logits))
+        train_prediction = tf.nn.softmax(logits)
+        
+        correct_prediction = tf.equal(labels, tf.argmax(train_prediction, 1))
+        tf_accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
         if augment_data:
             name = "Augmented_loss_" + str(lr) 
         else:
-            name = "loss_" + str(lr) 
+            name = str(lr) 
 
-        tf.summary.scalar(name, cost)
-
-        train_prediction = tf.nn.softmax(logits)
+        with tf.name_scope(name):
+            tf.summary.scalar("loss", cost)
+            tf.summary.scalar("accuracy", tf_accuracy)
 
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(update_ops):
@@ -226,6 +231,7 @@ def TrainModel(lr = 0.1, augment_data = True):
 
                 if step % 500 == 0:
                     _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
+                    tf.summary.scalar(name, l)
                     print('Minibatch loss at step %d: %f' % (step, l))
                     print('Minibatch accuracy: %.1f%%' % accuracy(batch_labels, predictions)) 
 
