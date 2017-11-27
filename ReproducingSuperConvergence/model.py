@@ -17,7 +17,7 @@ print("Test data", test_data.shape)
 print("Test labels", test_labels.shape)
 print("Mean Image (training)", mean_image.shape)
 
-def TrainModel(lr = 0.1):
+def TrainModel(lr = 0.1, augment_data = True):
     
     def accuracy(labels, predictions):
         return (100.0 * np.sum(np.argmax(predictions, 1) == labels) / predictions.shape[0])
@@ -127,12 +127,12 @@ def TrainModel(lr = 0.1):
         mean_image_tf = tf.constant(mean_image, dtype=tf.float32)
         learning_rate = tf.placeholder(tf.float32, shape=(), name="learning_rate")
 
-
-        input = tf.subtract(input, mean_image_tf)
-        #If we're training, randomly flip the image
-        input = tf.cond(is_training,
-                                 lambda: random_flip_left_right(input),
-                                 lambda: input)
+        if augment_data == True:
+            input = tf.subtract(input, mean_image_tf)
+            #If we're training, randomly flip the image
+            input = tf.cond(is_training,
+                                     lambda: random_flip_left_right(input),
+                                     lambda: input)
 
         #Stage 1
         shape = input.shape.as_list()
@@ -189,7 +189,12 @@ def TrainModel(lr = 0.1):
         logits = tf.matmul(reshape, weight) + bias
 
         cost = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=logits))
-        tf.summary.scalar("loss_" + str(lr), cost)
+        if augment_data:
+            name = "Augmented_loss_" + str(lr) 
+        else:
+            name = "loss_" + str(lr) 
+
+        tf.summary.scalar(name, cost)
 
         train_prediction = tf.nn.softmax(logits)
 
@@ -236,4 +241,12 @@ def TrainModel(lr = 0.1):
         
 
 if __name__ == '__main__':
-    TrainModel()
+    TrainModel(0.1, augment_data=True)
+    TrainModel(0.01, augment_data=True)
+    TrainModel(0.001, augment_data=True)
+    TrainModel(0.0001, augment_data=True)
+
+    TrainModel(0.1, augment_data=False)
+    TrainModel(0.01, augment_data=False)
+    TrainModel(0.001, augment_data=False)
+    TrainModel(0.0001, augment_data=False)
