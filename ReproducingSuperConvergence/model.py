@@ -34,7 +34,7 @@ def TrainModel(lr = 0.1, augment_data = True):
                                initializer=initializer,
                                regularizer=tf.contrib.layers.l2_regularizer(0.0001))
 
-    def residual_block(net, num_channels, stage, block):
+    def residual_block(net, num_channels, stage, block, is_training):
         weight_name_base = 'w' + str(stage) + block + '_branch'
         bias_name_base = 'b' + str(stage) + block + '_branch'
         conv_name_base = 'res' + str(stage) + block + '_branch'
@@ -51,7 +51,7 @@ def TrainModel(lr = 0.1, augment_data = True):
         weights = weight_layer(weight_name_base + '2a', [3, 3, shape[3], num_channels])
         bias = bias_variable(bias_name_base + '2a', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='SAME', name=conv_name_base + '2a') + bias
-        net = tf.layers.batch_normalization(net, name=bn_name_base + '2a', momentum=0.95)
+        net = tf.layers.batch_normalization(net, name=bn_name_base + '2a', momentum=0.95, training=is_training)
         net = tf.nn.relu(net)
 
         #ConvLayer2
@@ -63,7 +63,7 @@ def TrainModel(lr = 0.1, augment_data = True):
         weights = weight_layer(weight_name_base + '2b', [3, 3, shape[3], num_channels])
         bias = bias_variable(bias_name_base + '2b', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='SAME', name=conv_name_base + '2b') + bias
-        net = tf.layers.batch_normalization(net, name=bn_name_base + '2b', momentum=0.95)
+        net = tf.layers.batch_normalization(net, name=bn_name_base + '2b', momentum=0.95, training=is_training)
 
         #Final step: Add shortcut value to main path
         net = tf.add(net, shortcut)
@@ -71,7 +71,7 @@ def TrainModel(lr = 0.1, augment_data = True):
 
         return net
 
-    def downsample_block(net, num_channels, stage, block, stride=2):
+    def downsample_block(net, num_channels, stage, block, stride, is_training):
         weight_name_base = 'w' + str(stage) + block + '_branch'
         bias_name_base = 'b' + str(stage) + block + '_branch'
         conv_name_base = 'res' + str(stage) + block + '_branch'
@@ -88,7 +88,7 @@ def TrainModel(lr = 0.1, augment_data = True):
         weights = weight_layer(weight_name_base + '2a', [3, 3, shape[3], num_channels])
         bias = bias_variable(bias_name_base + '2a', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,2,2,1], padding='SAME', name=conv_name_base + '2a')
-        net = tf.layers.batch_normalization(net, name=bn_name_base + '2a', momentum=0.95)
+        net = tf.layers.batch_normalization(net, name=bn_name_base + '2a', momentum=0.95, training=is_training)
         net = tf.nn.relu(net)
 
         #ConvLayer2
@@ -100,7 +100,7 @@ def TrainModel(lr = 0.1, augment_data = True):
         weights = weight_layer(weight_name_base + '2b', [3, 3, shape[3], num_channels])
         bias = bias_variable(bias_name_base + '2b', [num_channels])
         net = tf.nn.conv2d(net, weights, strides=[1,1,1,1], padding='SAME', name=conv_name_base + '2b')
-        net = tf.layers.batch_normalization(net, name=bn_name_base + '2b', momentum=0.95)
+        net = tf.layers.batch_normalization(net, name=bn_name_base + '2b', momentum=0.95, training=is_training)
 
         #Avg Pool (of shortcut)
         #   padding     0   ("VALID") 
@@ -145,46 +145,46 @@ def TrainModel(lr = 0.1, augment_data = True):
         weights = weight_layer("w_conv1", [3, 3, shape[3], 16])
         bias = bias_variable("b_conv1", [16])
         net = tf.nn.conv2d(input, weights, strides=[1,1,1,1], padding='SAME') + bias
-        net = tf.layers.batch_normalization(net, name="bn_conv1", momentum=0.95)
+        net = tf.layers.batch_normalization(net, name="bn_conv1", momentum=0.95, training=is_training)
         net = tf.nn.relu(net)
         
         #Stage 2
         #RestNet Standard Block x9
-        net = residual_block(net, num_channels=16, stage=2, block='a')
-        net = residual_block(net, num_channels=16, stage=2, block='b')
-        net = residual_block(net, num_channels=16, stage=2, block='c')
-        net = residual_block(net, num_channels=16, stage=2, block='d')
-        net = residual_block(net, num_channels=16, stage=2, block='e')
-        net = residual_block(net, num_channels=16, stage=2, block='f')
-        net = residual_block(net, num_channels=16, stage=2, block='g')
-        net = residual_block(net, num_channels=16, stage=2, block='h')
-        net = residual_block(net, num_channels=16, stage=2, block='i')
+        net = residual_block(net, num_channels=16, stage=2, block='a', is_training=is_training)
+        net = residual_block(net, num_channels=16, stage=2, block='b', is_training=is_training)
+        net = residual_block(net, num_channels=16, stage=2, block='c', is_training=is_training)
+        net = residual_block(net, num_channels=16, stage=2, block='d', is_training=is_training)
+        net = residual_block(net, num_channels=16, stage=2, block='e', is_training=is_training)
+        net = residual_block(net, num_channels=16, stage=2, block='f', is_training=is_training)
+        net = residual_block(net, num_channels=16, stage=2, block='g', is_training=is_training)
+        net = residual_block(net, num_channels=16, stage=2, block='h', is_training=is_training)
+        net = residual_block(net, num_channels=16, stage=2, block='i', is_training=is_training)
 
         #Stage3
         #ResNet Downsample Block
-        net = downsample_block(net, num_channels=16, stage=3, block='a', stride=2)
+        net = downsample_block(net, num_channels=16, stage=3, block='a', stride=2, is_training=is_training)
         #ResNet Standard Block x8
-        net = residual_block(net, num_channels=32, stage=3, block='b')
-        net = residual_block(net, num_channels=32, stage=3, block='c')
-        net = residual_block(net, num_channels=32, stage=3, block='d')
-        net = residual_block(net, num_channels=32, stage=3, block='e')
-        net = residual_block(net, num_channels=32, stage=3, block='f')
-        net = residual_block(net, num_channels=32, stage=3, block='g')
-        net = residual_block(net, num_channels=32, stage=3, block='h')
-        net = residual_block(net, num_channels=32, stage=3, block='i')
+        net = residual_block(net, num_channels=32, stage=3, block='b', is_training=is_training)
+        net = residual_block(net, num_channels=32, stage=3, block='c', is_training=is_training)
+        net = residual_block(net, num_channels=32, stage=3, block='d', is_training=is_training)
+        net = residual_block(net, num_channels=32, stage=3, block='e', is_training=is_training)
+        net = residual_block(net, num_channels=32, stage=3, block='f', is_training=is_training)
+        net = residual_block(net, num_channels=32, stage=3, block='g', is_training=is_training)
+        net = residual_block(net, num_channels=32, stage=3, block='h', is_training=is_training)
+        net = residual_block(net, num_channels=32, stage=3, block='i', is_training=is_training)
 
         #Stage4
         #ResNet Downsample Block
-        net = downsample_block(net, num_channels=32, stage=4, block='a', stride=2)
+        net = downsample_block(net, num_channels=32, stage=4, block='a', stride=2, is_training=is_training)
         #ResNet Standard Block x8
-        net = residual_block(net, num_channels=64, stage=4, block='b')
-        net = residual_block(net, num_channels=64, stage=4, block='c')
-        net = residual_block(net, num_channels=64, stage=4, block='d')
-        net = residual_block(net, num_channels=64, stage=4, block='e')
-        net = residual_block(net, num_channels=64, stage=4, block='f')
-        net = residual_block(net, num_channels=64, stage=4, block='g')
-        net = residual_block(net, num_channels=64, stage=4, block='h')
-        net = residual_block(net, num_channels=64, stage=4, block='i')
+        net = residual_block(net, num_channels=64, stage=4, block='b', is_training=is_training)
+        net = residual_block(net, num_channels=64, stage=4, block='c', is_training=is_training)
+        net = residual_block(net, num_channels=64, stage=4, block='d', is_training=is_training)
+        net = residual_block(net, num_channels=64, stage=4, block='e', is_training=is_training)
+        net = residual_block(net, num_channels=64, stage=4, block='f', is_training=is_training)
+        net = residual_block(net, num_channels=64, stage=4, block='g', is_training=is_training)
+        net = residual_block(net, num_channels=64, stage=4, block='h', is_training=is_training)
+        net = residual_block(net, num_channels=64, stage=4, block='i', is_training=is_training)
 
         net = tf.nn.avg_pool(net, ksize=[1,8,8,1], strides=[1,1,1,1], padding='VALID')
         shape = net.shape.as_list()
