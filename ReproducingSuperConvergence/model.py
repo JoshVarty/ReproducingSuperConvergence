@@ -238,6 +238,10 @@ def TrainModel(lr = 0.1, augment_data = True):
                 if step % 100 == 0:
                     _, l, predictions, m = session.run([optimizer, cost, train_prediction, merged], feed_dict=feed_dict)
                     writer.add_summary(m, step)
+                    
+                    #If we ever end up getting NaNs, just end
+                    if np.isnan(l):
+                        break
                 else:
                     _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
 
