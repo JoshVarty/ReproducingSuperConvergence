@@ -26,7 +26,9 @@ def TrainModel(lr = 0.1, augment_data = True):
         return tf.get_variable(name, shape, initializer=tf.constant_initializer(0))
 
     def weight_layer(name, shape):
-        return tf.get_variable(name, shape, initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0, uniform=False))
+        return tf.get_variable(name, shape, 
+                               initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0, uniform=False),
+                               regularizer=tf.contrib.layers.l2_regularizer(0.0001))
 
     def residual_block(net, num_channels, stage, block):
         weight_name_base = 'w' + str(stage) + block + '_branch'
