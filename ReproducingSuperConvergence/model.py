@@ -203,9 +203,9 @@ def TrainModel(lr = 0.1, augment_data = True):
         tf_accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
         if augment_data:
-            name = "Augmented_loss_" + str(lr) 
+            name = "AugmentedData_LR_" + str(lr) 
         else:
-            name = str(lr) 
+            name = "LR_" + str(lr) 
 
         with tf.name_scope(name):
             tf.summary.scalar("loss", cost)
