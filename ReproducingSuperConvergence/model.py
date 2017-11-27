@@ -25,9 +25,13 @@ def TrainModel(lr = 0.1, augment_data = True):
     def bias_variable(name, shape):
         return tf.get_variable(name, shape, initializer=tf.constant_initializer(0))
 
-    def weight_layer(name, shape):
+    def weight_layer(name, shape, initializer = None):
+        if initializer is None:
+            #Default to initializer for Relu layers
+            initializer = tf.contrib.layers.variance_scaling_initializer()
+
         return tf.get_variable(name, shape, 
-                               initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0, uniform=False),
+                               initializer=initializer,
                                regularizer=tf.contrib.layers.l2_regularizer(0.0001))
 
     def residual_block(net, num_channels, stage, block):
@@ -186,7 +190,9 @@ def TrainModel(lr = 0.1, augment_data = True):
         shape = net.shape.as_list()
         reshape = tf.reshape(net, [-1, shape[3]])
 
-        weight = weight_layer("w_fc", [shape[3], num_labels])
+        #User Xavier Initialization since we're going to run this through a SoftMax
+        initializer = tf.contrib.layers.xavier_initializer()
+        weight = weight_layer("w_fc", [shape[3], num_labels], initializer)
         bias = bias_variable("b_fc", [num_labels])
         logits = tf.matmul(reshape, weight) + bias
 
