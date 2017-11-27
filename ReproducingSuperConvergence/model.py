@@ -199,7 +199,7 @@ def TrainModel(lr = 0.1, augment_data = True):
         cost = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=logits))
         train_prediction = tf.nn.softmax(logits)
         
-        correct_prediction = tf.equal(labels, tf.argmax(train_prediction, 1))
+        correct_prediction = tf.equal(labels, tf.cast(tf.argmax(train_prediction, 1), tf.int32))
         tf_accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
         if augment_data:
