@@ -222,8 +222,12 @@ def TrainModel(lr = 0.1, augment_data = True):
             merged = tf.summary.merge_all()
             writer = tf.summary.FileWriter(tensorboardPath)
             writer.add_graph(session.graph)
-            num_steps = 30000
-            batch_size = 128
+
+            #100 epochs * 400 steps each
+            num_steps = 40000
+            batch_size = 125
+            current_epoch = 0
+
             tf.global_variables_initializer().run()
             for step in range(num_steps):
                 offset = (step * batch_size) % (train_labels.shape[0] - batch_size)
@@ -245,6 +249,10 @@ def TrainModel(lr = 0.1, augment_data = True):
                     #If we ever end up getting NaNs, just end
                     if np.isnan(l):
                         break
+
+                if (step + 1) % 400 == 0:
+                    current_epoch = current_epoch + 1
+                    print("Increasing current_epoch:", current_epoch)
 
             #See test set performance
             accuracySum = 0.0
