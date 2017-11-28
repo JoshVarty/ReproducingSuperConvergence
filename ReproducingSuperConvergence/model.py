@@ -1,4 +1,5 @@
 import os
+import shutil
 import numpy as np
 import data_loader
 import tensorflow as tf
@@ -8,6 +9,8 @@ image_size = 32
 num_channels = 3
 pixel_depth = 255
 num_labels = 10
+
+tensorboardPath = "/tmp/svhn_single"
 
 train_data, train_labels, test_data, test_labels, mean_image = data_loader.load_data()
 
@@ -217,7 +220,7 @@ def TrainModel(lr = 0.1, augment_data = True):
 
         with tf.Session(graph=graph) as session:
             merged = tf.summary.merge_all()
-            writer = tf.summary.FileWriter("/tmp/svhn_single")
+            writer = tf.summary.FileWriter(tensorboardPath)
             writer.add_graph(session.graph)
             num_steps = 30000
             batch_size = 128
@@ -259,6 +262,7 @@ def TrainModel(lr = 0.1, augment_data = True):
         
 
 if __name__ == '__main__':
+    shutil.rmtree(tensorboardPath)
     TrainModel(0.1, augment_data=True)
     TrainModel(0.01, augment_data=True)
     TrainModel(0.001, augment_data=True)
