@@ -222,9 +222,9 @@ def TrainModel(lr = 0.1, augment_data = True):
             num_epochs = 100
             tf.global_variables_initializer().run()
             for epoch in range(0, num_epochs):
-                #50,000 training examples / 200 batch_size = 250 steps
-                num_steps = 250
-                batch_size = 200
+                #50,000 training examples / 125 batch_size = 400 steps
+                num_steps = 400
+                batch_size = 125
                 for step in range(num_steps):
                     offset = (step * batch_size) % (train_labels.shape[0] - batch_size)
                     batch_data = train_data[offset:(offset + batch_size), :, :]
