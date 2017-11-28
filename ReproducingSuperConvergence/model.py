@@ -234,6 +234,7 @@ def TrainModel(lr = 0.1, augment_data = True):
 
                     if step % 500 == 0:
                         _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
+                        tf.summary.scalar(name, l)
                         print('Minibatch loss at step %d: %f' % (step, l))
                         print('Minibatch accuracy: %.1f%%' % accuracy(batch_labels, predictions)) 
 
