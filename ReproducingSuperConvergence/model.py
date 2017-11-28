@@ -219,31 +219,34 @@ def TrainModel(lr = 0.1, augment_data = True):
             merged = tf.summary.merge_all()
             writer = tf.summary.FileWriter("/tmp/svhn_single")
             writer.add_graph(session.graph)
-            num_steps = 30000
-            batch_size = 128
+            num_epochs = 100
             tf.global_variables_initializer().run()
-            for step in range(num_steps):
-                offset = (step * batch_size) % (train_labels.shape[0] - batch_size)
-                batch_data = train_data[offset:(offset + batch_size), :, :]
-                batch_labels = np.squeeze(train_labels[offset:(offset + batch_size), :])
+            for epoch in range(0, num_epochs):
+                #50,000 training examples / 200 batch_size = 250 steps
+                num_steps = 250
+                batch_size = 200
+                for step in range(num_steps):
+                    offset = (step * batch_size) % (train_labels.shape[0] - batch_size)
+                    batch_data = train_data[offset:(offset + batch_size), :, :]
+                    batch_labels = np.squeeze(train_labels[offset:(offset + batch_size), :])
 
-                feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: True} 
+                    feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: True} 
 
-                if step % 500 == 0:
-                    _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
-                    tf.summary.scalar(name, l)
-                    print('Minibatch loss at step %d: %f' % (step, l))
-                    print('Minibatch accuracy: %.1f%%' % accuracy(batch_labels, predictions)) 
+                    if step % 500 == 0:
+                        _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
+                        tf.summary.scalar(name, l)
+                        print('Minibatch loss at step %d: %f' % (step, l))
+                        print('Minibatch accuracy: %.1f%%' % accuracy(batch_labels, predictions)) 
 
-                if step % 100 == 0:
-                    _, l, predictions, m = session.run([optimizer, cost, train_prediction, merged], feed_dict=feed_dict)
-                    writer.add_summary(m, step)
-                    
-                    #If we ever end up getting NaNs, just end
-                    if np.isnan(l):
-                        break
-                else:
-                    _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
+                    if step % 100 == 0:
+                        _, l, predictions, m = session.run([optimizer, cost, train_prediction, merged], feed_dict=feed_dict)
+                        writer.add_summary(m, step)
+                        
+                        #If we ever end up getting NaNs, just end
+                        if np.isnan(l):
+                            break
+                    else:
+                        _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
 
             #See test set performance
             accuracySum = 0.0
