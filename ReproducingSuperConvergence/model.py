@@ -219,7 +219,6 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
 
             #100 epochs * 400 steps each
             batch_size = 125
-            current_epoch = 0
 
             tf.global_variables_initializer().run()
             for step in range(max_iter):
@@ -246,10 +245,6 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                     #If we ever end up getting NaNs, just end
                     if np.isnan(l):
                         break
-
-                if (step + 1) % 400 == 0:
-                    current_epoch = current_epoch + 1
-                    print("Increasing current_epoch:", current_epoch)
 
             #See test set performance
             accuracySum = 0.0
