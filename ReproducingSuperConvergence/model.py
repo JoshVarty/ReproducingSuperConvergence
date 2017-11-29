@@ -20,7 +20,7 @@ print("Test data", test_data.shape)
 print("Test labels", test_labels.shape)
 print("Mean Image (training)", mean_image.shape)
 
-def TrainModel(min_lr, max_lr, stepsize, max_iter):
+def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
     def accuracy(labels, predictions):
         return (100.0 * np.sum(np.argmax(predictions, 1) == labels) / predictions.shape[0])
 
@@ -203,7 +203,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter):
         correct_prediction = tf.equal(labels, tf.cast(tf.argmax(train_prediction, 1), tf.int32))
         tf_accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-        with tf.name_scope(min_lr + "_" + max_lr + "_" + stepsize + "_" + max_iter):
+        with tf.name_scope(name):
             tf.summary.scalar("loss", cost)
             tf.summary.scalar("accuracy", tf_accuracy)
             tf.summary.scalar("LR", lr)
@@ -275,4 +275,4 @@ if __name__ == '__main__':
     stepsize = 5000
     max_iter = 10000
 
-    TrainModel(min_lr=0.1, max_lr=3.0, stepsize=5000, max_iter=10000)
+    TrainModel(min_lr=0.1, max_lr=3.0, stepsize=5000, max_iter=10000, name="Fig1b")
