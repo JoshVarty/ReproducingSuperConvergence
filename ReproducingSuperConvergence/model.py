@@ -206,13 +206,14 @@ def TrainModel(lr = 0.1, augment_data = True):
         tf_accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
         if augment_data:
-            name = "AugmentedData_LR_" + str(lr) 
+            name = "AugmentedData"
         else:
-            name = "LR_" + str(lr) 
+            name = "_"
 
         with tf.name_scope(name):
             tf.summary.scalar("loss", cost)
             tf.summary.scalar("accuracy", tf_accuracy)
+            tf.summary.scalar("LR", lr)
 
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(update_ops):
@@ -228,11 +229,20 @@ def TrainModel(lr = 0.1, augment_data = True):
             batch_size = 125
             current_epoch = 0
 
+            min_lr = 0.1
+            max_lr = 3.0
+            stepsize = 5000
+            max_iter = 10000
+
             tf.global_variables_initializer().run()
-            for step in range(num_steps):
+            for step in range(max_iter):
                 offset = (step * batch_size) % (train_labels.shape[0] - batch_size)
                 batch_data = train_data[offset:(offset + batch_size), :, :]
                 batch_labels = np.squeeze(train_labels[offset:(offset + batch_size), :])
+
+                cycle = np.floor(1 + current_epoch / (2 * stepsize))
+                x = np.abs(current_epoch/stepsize - 2 * cycle + 1)
+                lr = min_lr + (max_lr - min_lr) * np.max((0.0, 1.0 - x))
 
                 feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: True} 
 
