@@ -206,7 +206,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
         with tf.name_scope(name):
             tf.summary.scalar("loss", cost)
             tf.summary.scalar("accuracy", tf_accuracy)
-            tf.summary.scalar("LR", lr)
+            tf.summary.scalar("LR", learning_rate)
 
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(update_ops):
