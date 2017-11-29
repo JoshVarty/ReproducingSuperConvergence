@@ -225,7 +225,6 @@ def TrainModel(lr = 0.1, augment_data = True):
             writer.add_graph(session.graph)
 
             #100 epochs * 400 steps each
-            num_steps = 40000
             batch_size = 125
             current_epoch = 0
 
