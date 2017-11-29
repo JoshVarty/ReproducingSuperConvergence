@@ -270,7 +270,10 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter):
         
 
 if __name__ == '__main__':
-    shutil.rmtree(tensorboardPath)
+    try:
+        shutil.rmtree(tensorboardPath)
+    except:
+        pass
 
     min_lr = 0.1
     max_lr = 3.0
