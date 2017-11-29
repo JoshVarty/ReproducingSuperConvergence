@@ -203,12 +203,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter):
         correct_prediction = tf.equal(labels, tf.cast(tf.argmax(train_prediction, 1), tf.int32))
         tf_accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-        if augment_data:
-            name = "AugmentedData"
-        else:
-            name = "_"
-
-        with tf.name_scope(name):
+        with tf.name_scope(min_lr + "_" + max_lr + "_" + stepsize + "_" + max_iter):
             tf.summary.scalar("loss", cost)
             tf.summary.scalar("accuracy", tf_accuracy)
             tf.summary.scalar("LR", lr)
