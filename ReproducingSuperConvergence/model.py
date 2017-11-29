@@ -20,8 +20,7 @@ print("Test data", test_data.shape)
 print("Test labels", test_labels.shape)
 print("Mean Image (training)", mean_image.shape)
 
-def TrainModel(lr = 0.1, augment_data = True):
-    
+def TrainModel(min_lr, max_lr, stepsize, max_iter):
     def accuracy(labels, predictions):
         return (100.0 * np.sum(np.argmax(predictions, 1) == labels) / predictions.shape[0])
 
@@ -136,12 +135,11 @@ def TrainModel(lr = 0.1, augment_data = True):
         mean_image_tf = tf.constant(mean_image, dtype=tf.float32)
         learning_rate = tf.placeholder(tf.float32, shape=(), name="learning_rate")
 
-        if augment_data == True:
-            input = tf.subtract(input, mean_image_tf)
-            #If we're training, randomly flip the image
-            input = tf.cond(is_training,
-                                     lambda: random_flip_left_right(input),
-                                     lambda: input)
+        input = tf.subtract(input, mean_image_tf)
+        #If we're training, randomly flip the image
+        input = tf.cond(is_training,
+                                 lambda: random_flip_left_right(input),
+                                 lambda: input)
 
         #Stage 1
         shape = input.shape.as_list()
@@ -228,11 +226,6 @@ def TrainModel(lr = 0.1, augment_data = True):
             batch_size = 125
             current_epoch = 0
 
-            min_lr = 0.1
-            max_lr = 3.0
-            stepsize = 5000
-            max_iter = 10000
-
             tf.global_variables_initializer().run()
             for step in range(max_iter):
                 offset = (step * batch_size) % (train_labels.shape[0] - batch_size)
@@ -278,12 +271,10 @@ def TrainModel(lr = 0.1, augment_data = True):
 
 if __name__ == '__main__':
     shutil.rmtree(tensorboardPath)
-    TrainModel(0.1, augment_data=True)
-    TrainModel(0.01, augment_data=True)
-    TrainModel(0.001, augment_data=True)
-    TrainModel(0.0001, augment_data=True)
 
-    TrainModel(0.1, augment_data=False)
-    TrainModel(0.01, augment_data=False)
-    TrainModel(0.001, augment_data=False)
-    TrainModel(0.0001, augment_data=False)
+    min_lr = 0.1
+    max_lr = 3.0
+    stepsize = 5000
+    max_iter = 10000
+
+    TrainModel(min_lr=0.1, max_lr=3.0, stepsize=5000, max_iter=10000)
