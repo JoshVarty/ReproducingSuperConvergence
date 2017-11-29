@@ -227,8 +227,8 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                 batch_data = train_data[offset:(offset + batch_size), :, :]
                 batch_labels = np.squeeze(train_labels[offset:(offset + batch_size), :])
 
-                cycle = np.floor(1 + current_epoch / (2 * stepsize))
-                x = np.abs(current_epoch/stepsize - 2 * cycle + 1)
+                cycle = np.floor(1 + step / (2 * stepsize))
+                x = np.abs(step/stepsize - 2 * cycle + 1)
                 lr = min_lr + (max_lr - min_lr) * np.max((0.0, 1.0 - x))
 
                 feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: True} 
