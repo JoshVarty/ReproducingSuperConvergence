@@ -246,17 +246,18 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                     if np.isnan(l):
                         break
 
-            #See test set performance
-            accuracySum = 0.0
-            for i in range(0, len(test_data), int(len(test_data) / 10)):
-                batch_data = test_data[i:i + int(len(test_data) / 10)]
-                batch_labels = np.squeeze(test_labels[i:i + int(len(test_data) / 10)])
-                feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: False} 
-                _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
-                currentAccuracy = accuracy(batch_labels, predictions)
-                accuracySum = accuracySum + currentAccuracy
+            if step % 1000 == 0:
+                #See test set performance
+                accuracySum = 0.0
+                for i in range(0, len(test_data), int(len(test_data) / 10)):
+                    batch_data = test_data[i:i + int(len(test_data) / 10)]
+                    batch_labels = np.squeeze(test_labels[i:i + int(len(test_data) / 10)])
+                    feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: False} 
+                    _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
+                    currentAccuracy = accuracy(batch_labels, predictions)
+                    accuracySum = accuracySum + currentAccuracy
 
-            print('Test accuracy: %.1f%%' % (accuracySum / 10))
+                print('Test accuracy: %.1f%%' % (accuracySum / 10))
         
 
 if __name__ == '__main__':
