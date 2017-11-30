@@ -242,6 +242,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                     
                     #If we ever end up getting NaNs, just end
                     if np.isnan(l):
+                        print("Loss is NAN at step:", step)
                         break
 
                 if step % 100 == 0:
