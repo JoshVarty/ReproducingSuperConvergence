@@ -208,7 +208,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
 
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(update_ops):
-            optimizer = tf.train.AdadeltaOptimizer(learning_rate).minimize(cost)
+            optimizer = tf.train.MomentumOptimizer(learning_rate, momentum=0.9, use_nesterov=True).minimize(cost)
 
         with tf.Session(graph=graph) as session:
             merged = tf.summary.merge_all()
