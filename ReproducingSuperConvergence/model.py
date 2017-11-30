@@ -236,13 +236,13 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
 
                     if step % 500 == 0:
                         print('Minibatch loss at step %d: %f' % (step, l), flush=True)
-                        print('Minibatch accuracy: %.1f%%' % acc, flush=True) 
+                        print(('Minibatch accuracy:', acc), flush=True) 
                 else:
                     _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
                     
                     #If we ever end up getting NaNs, just end
                     if np.isnan(l):
-                        print("Loss is NAN at step:", step)
+                        print("Loss is NaN at step:", step)
                         break
 
                 if step % 100 == 0:
