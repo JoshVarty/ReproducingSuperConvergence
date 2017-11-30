@@ -219,7 +219,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
             batch_size = 125
 
             tf.global_variables_initializer().run()
-            for step in range(max_iter):
+            for step in range(max_iter + 1):
                 offset = (step * batch_size) % (train_labels.shape[0] - batch_size)
                 batch_data = train_data[offset:(offset + batch_size), :, :]
                 batch_labels = np.squeeze(train_labels[offset:(offset + batch_size), :])
