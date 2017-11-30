@@ -256,7 +256,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                         _, l, predictions, acc = session.run([optimizer, cost, train_prediction, tf_accuracy], feed_dict=feed_dict)
                         accuracySum = accuracySum + acc
 
-                    print('Test accuracy: %.1f%%' % (accuracySum / 100), flush=True)
+                    print('Test accuracy: %.1f%%' % (accuracySum / 100) * 100, flush=True)
         
 
 if __name__ == '__main__':
