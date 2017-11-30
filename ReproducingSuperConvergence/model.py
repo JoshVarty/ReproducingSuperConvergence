@@ -21,8 +21,6 @@ print("Test labels", test_labels.shape)
 print("Mean Image (training)", mean_image.shape)
 
 def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
-    def accuracy(labels, predictions):
-        return (100.0 * np.sum(np.argmax(predictions, 1) == labels) / predictions.shape[0])
 
     def bias_variable(name, shape):
         return tf.get_variable(name, shape, initializer=tf.constant_initializer(0))
@@ -233,12 +231,12 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                 feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: True} 
 
                 if step % 100 == 0:
-                    _, l, predictions, m = session.run([optimizer, cost, train_prediction, merged], feed_dict=feed_dict)
+                    _, l, predictions, m, acc = session.run([optimizer, cost, train_prediction, merged, tf_accuracy], feed_dict=feed_dict)
                     writer.add_summary(m, step)
 
                     if step % 500 == 0:
                         print('Minibatch loss at step %d: %f' % (step, l))
-                        print('Minibatch accuracy: %.1f%%' % accuracy(batch_labels, predictions)) 
+                        print('Minibatch accuracy: %.1f%%' % acc) 
                 else:
                     _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
                     
@@ -246,18 +244,18 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                     if np.isnan(l):
                         break
 
-            if step % 1000 == 0:
-                #See test set performance
-                accuracySum = 0.0
-                for i in range(0, len(test_data), int(len(test_data) / 10)):
-                    batch_data = test_data[i:i + int(len(test_data) / 10)]
-                    batch_labels = np.squeeze(test_labels[i:i + int(len(test_data) / 10)])
-                    feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: False} 
-                    _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
-                    currentAccuracy = accuracy(batch_labels, predictions)
-                    accuracySum = accuracySum + currentAccuracy
+                if step % 100 == 0:
+                    #See test set performance
+                    accuracySum = 0.0
 
-                print('Test accuracy: %.1f%%' % (accuracySum / 10))
+                    for i in range(0, len(test_data), int(len(test_data) / 100)):
+                        batch_data = test_data[i:i + int(len(test_data) / 100)]
+                        batch_labels = np.squeeze(test_labels[i:i + int(len(test_data) / 100)])
+                        feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: False} 
+                        _, l, predictions, acc = session.run([optimizer, cost, train_prediction, tf_accuracy], feed_dict=feed_dict)
+                        accuracySum = accuracySum + acc
+
+                    print('Test accuracy: %.1f%%' % (accuracySum / 100))
         
 
 if __name__ == '__main__':
