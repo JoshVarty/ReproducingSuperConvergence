@@ -14,11 +14,11 @@ tensorboardPath = "/tmp/svhn_single"
 
 train_data, train_labels, test_data, test_labels, mean_image = data_loader.load_data()
 
-print("Train data", train_data.shape)
-print("Train labels", train_labels.shape)
-print("Test data", test_data.shape)
-print("Test labels", test_labels.shape)
-print("Mean Image (training)", mean_image.shape)
+print("Train data", train_data.shape, flush=True)
+print("Train labels", train_labels.shape, flush=True)
+print("Test data", test_data.shape, flush=True)
+print("Test labels", test_labels.shape, flush=True)
+print("Mean Image (training)", mean_image.shape, flush=True)
 
 def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
 
@@ -235,8 +235,8 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                     writer.add_summary(m, step)
 
                     if step % 500 == 0:
-                        print('Minibatch loss at step %d: %f' % (step, l))
-                        print('Minibatch accuracy: %.1f%%' % acc) 
+                        print('Minibatch loss at step %d: %f' % (step, l), flush=True)
+                        print('Minibatch accuracy: %.1f%%' % acc, flush=True) 
                 else:
                     _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
                     
@@ -255,7 +255,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                         _, l, predictions, acc = session.run([optimizer, cost, train_prediction, tf_accuracy], feed_dict=feed_dict)
                         accuracySum = accuracySum + acc
 
-                    print('Test accuracy: %.1f%%' % (accuracySum / 100))
+                    print('Test accuracy: %.1f%%' % (accuracySum / 100), flush=True)
         
 
 if __name__ == '__main__':
