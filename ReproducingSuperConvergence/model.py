@@ -208,7 +208,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
 
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(update_ops):
-            optimizer = tf.train.MomentumOptimizer(learning_rate, momentum=0.9, use_nesterov=True).minimize(cost)
+            optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
 
         with tf.Session(graph=graph) as session:
             merged = tf.summary.merge_all()
@@ -236,7 +236,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
 
                     if step % 500 == 0:
                         print('Minibatch loss at step %d: %f' % (step, l), flush=True)
-                        print('Minibatch accuracy: %.1f%%' % acc * 100, flush=True) 
+                        print('Minibatch accuracy: %.1f%%' % (acc * 100), flush=True) 
                 else:
                     _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
                     
@@ -256,7 +256,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                         _, l, predictions, acc = session.run([optimizer, cost, train_prediction, tf_accuracy], feed_dict=feed_dict)
                         accuracySum = accuracySum + acc
 
-                    print('Test accuracy: %.1f%%' % (accuracySum / 100) * 100, flush=True)
+                    print('Test accuracy: %.1f%%' % ((accuracySum / 100) * 100), flush=True)
         
 
 if __name__ == '__main__':
