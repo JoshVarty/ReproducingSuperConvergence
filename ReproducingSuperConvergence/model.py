@@ -253,7 +253,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                         batch_data = test_data[i:i + int(len(test_data) / 100)]
                         batch_labels = np.squeeze(test_labels[i:i + int(len(test_data) / 100)])
                         feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: False} 
-                        _, l, predictions, acc = session.run([optimizer, cost, train_prediction, tf_accuracy], feed_dict=feed_dict)
+                        l, predictions, acc = session.run([cost, train_prediction, tf_accuracy], feed_dict=feed_dict)
                         accuracySum = accuracySum + acc
 
                     print('Test accuracy: %.1f%%' % ((accuracySum / 100) * 100), flush=True)
