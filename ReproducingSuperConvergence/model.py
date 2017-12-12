@@ -207,8 +207,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
         correct_prediction = tf.equal(labels, tf.cast(tf.argmax(train_prediction, 1), tf.int32))
         tf_accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-        is_training_str = tf.cast(is_training, dtype=tf.string)
-        logToTensorboard(name + "_" + is_training_str, cost, tf_accuracy, learning_rate),
+        logToTensorboard(name, cost, tf_accuracy, learning_rate),
             
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(update_ops):
@@ -257,7 +256,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                         batch_data = test_data[i:i + int(len(test_data) / 100)]
                         batch_labels = np.squeeze(test_labels[i:i + int(len(test_data) / 100)])
                         feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: False} 
-                        l, predictions, acc, m = session.run([cost, train_prediction, tf_accuracy, merged], feed_dict=feed_dict)
+                        l, predictions, acc, = session.run([cost, train_prediction, tf_accuracy], feed_dict=feed_dict)
                         accuracySum = accuracySum + acc
 
                     print('Test accuracy: %.1f%%' % ((accuracySum / 100) * 100), flush=True)
