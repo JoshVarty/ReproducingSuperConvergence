@@ -125,6 +125,12 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
         result = tf.where(mirror_cond, x=input, y=tf.reverse(input, [2]))
         return result
 
+    def logToTensorboard(name, cost, accuracy, learning_rate):
+        with tf.name_scope(name):
+                tf.summary.scalar("loss", cost)
+                tf.summary.scalar("accuracy", accuracy)
+                tf.summary.scalar("LR", learning_rate)
+
     graph = tf.Graph()
     with graph.as_default():
         input = tf.placeholder(tf.float32, shape=(None, image_size, image_size, num_channels), name="input")
@@ -201,11 +207,10 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
         correct_prediction = tf.equal(labels, tf.cast(tf.argmax(train_prediction, 1), tf.int32))
         tf_accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-        with tf.name_scope(name):
-            tf.summary.scalar("loss", cost)
-            tf.summary.scalar("accuracy", tf_accuracy)
-            tf.summary.scalar("LR", learning_rate)
-
+        tf.cond(is_training,
+                lambda: logToTensorboard(name + "_train", cost, tf_accuracy, learning_rate),
+                lambda: logToTensorboard(name + "_test", cost, tf_accuracy, learning_rate))
+            
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(update_ops):
             optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
