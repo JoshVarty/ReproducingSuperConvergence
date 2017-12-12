@@ -130,6 +130,8 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                 tf.summary.scalar("loss", cost)
                 tf.summary.scalar("accuracy", accuracy)
                 tf.summary.scalar("LR", learning_rate)
+        #Have to return a tensor in order for tf.cond() to work properly
+        return tf.get_variable(name, [1], initializer=tf.constant_initializer(0))
 
     graph = tf.Graph()
     with graph.as_default():
@@ -258,7 +260,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                         batch_data = test_data[i:i + int(len(test_data) / 100)]
                         batch_labels = np.squeeze(test_labels[i:i + int(len(test_data) / 100)])
                         feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: False} 
-                        l, predictions, acc = session.run([cost, train_prediction, tf_accuracy], feed_dict=feed_dict)
+                        l, predictions, acc, m = session.run([cost, train_prediction, tf_accuracy, merged], feed_dict=feed_dict)
                         accuracySum = accuracySum + acc
 
                     print('Test accuracy: %.1f%%' % ((accuracySum / 100) * 100), flush=True)
