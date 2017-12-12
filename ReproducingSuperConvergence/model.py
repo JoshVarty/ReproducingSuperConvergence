@@ -270,4 +270,4 @@ if __name__ == '__main__':
     stepsize = 5000
     max_iter = 10000
 
-    TrainModel(min_lr=0.1, max_lr=3.0, stepsize=5000, max_iter=10000, name="Fig1b")
+    TrainModel(min_lr=0.1, max_lr=3.0, stepsize=5000, max_iter=10000, name="Fig1a")
