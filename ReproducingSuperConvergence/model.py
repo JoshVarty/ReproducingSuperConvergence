@@ -130,8 +130,6 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                 tf.summary.scalar("loss", cost)
                 tf.summary.scalar("accuracy", accuracy)
                 tf.summary.scalar("LR", learning_rate)
-        #Have to return a tensor in order for tf.cond() to work properly
-        return tf.get_variable(name, [1], initializer=tf.constant_initializer(0))
 
     graph = tf.Graph()
     with graph.as_default():
@@ -209,9 +207,8 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
         correct_prediction = tf.equal(labels, tf.cast(tf.argmax(train_prediction, 1), tf.int32))
         tf_accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-        tf.cond(is_training,
-                lambda: logToTensorboard(name + "_train", cost, tf_accuracy, learning_rate),
-                lambda: logToTensorboard(name + "_test", cost, tf_accuracy, learning_rate))
+        is_training_str = tf.cast(is_training, dtype=tf.string)
+        logToTensorboard(name + "_" + is_training_str, cost, tf_accuracy, learning_rate),
             
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(update_ops):
