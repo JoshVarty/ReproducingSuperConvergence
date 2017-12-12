@@ -248,7 +248,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                         print("Loss is NaN at step:", step)
                         break
 
-                if step % 100 == 0:
+                if step % 500 == 0:
                     #See test set performance
                     accuracySum = 0.0
 
