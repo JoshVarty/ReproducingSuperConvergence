@@ -259,7 +259,12 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                         l, predictions, acc, = session.run([cost, train_prediction, tf_accuracy], feed_dict=feed_dict)
                         accuracySum = accuracySum + acc
 
-                    print('Test accuracy: %.1f%%' % ((accuracySum / 100) * 100), flush=True)
+
+                    test_accuracy = (accuracySum / 100) * 10
+                    summary = tf.Summary()
+                    summary.value.add(tag='Test Accuracy', simple_value=test_accuracy)
+                    writer.add_summary(summary, step)
+                    print('Test accuracy: %.1f%%' % (0), flush=True)
         
 
 if __name__ == '__main__':
