@@ -260,7 +260,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                         accuracySum = accuracySum + acc
 
 
-                    test_accuracy = (accuracySum / 100) * 10
+                    test_accuracy = (accuracySum / 100) * 100
                     summary = tf.Summary()
                     summary.value.add(tag='Test Accuracy', simple_value=test_accuracy)
                     writer.add_summary(summary, step)
