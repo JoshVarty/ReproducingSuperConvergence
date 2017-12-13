@@ -20,7 +20,7 @@ print("Test data", test_data.shape, flush=True)
 print("Test labels", test_labels.shape, flush=True)
 print("Mean Image (training)", mean_image.shape, flush=True)
 
-def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
+def TrainModel(name, max_iter, lr, lr_update_scheme, options):
 
     def bias_variable(name, shape):
         return tf.get_variable(name, shape, initializer=tf.constant_initializer(0))
@@ -227,9 +227,19 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                 batch_data = train_data[offset:(offset + batch_size), :, :]
                 batch_labels = np.squeeze(train_labels[offset:(offset + batch_size), :])
 
-                cycle = np.floor(1 + step / (2 * stepsize))
-                x = np.abs(step/stepsize - 2 * cycle + 1)
-                lr = min_lr + (max_lr - min_lr) * np.max((0.0, 1.0 - x))
+                if lr_update_scheme == "triangular":
+                    min_lr = options["min_lr"]
+                    max_lr = options["max_lr"]
+                    stepsize = options["stepsize"]
+                    max_iter = options["max_iter"]
+                    cycle = np.floor(1 + step / (2 * stepsize))
+                    x = np.abs(step/stepsize - 2 * cycle + 1)
+                    lr = min_lr + (max_lr - min_lr) * np.max((0.0, 1.0 - x))
+                elif lr_update_scheme == 'multistep':
+                    gamma = options["gamma"]
+                    steps = options["steps"]
+                    if step in steps:
+                        lr = lr * gamma
 
                 feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: True} 
 
@@ -273,9 +283,17 @@ if __name__ == '__main__':
     except:
         pass
 
-    min_lr = 0.1
-    max_lr = 3.0
-    stepsize = 5000
-    max_iter = 10000
+    #options = {
+    #    "min_lr" : 0.1,
+    #    "max_lr" : 3.0,
+    #    "stepsize" : 5000,
+    #    "max_iter" : 10000
+    #}
+    #TrainModel(name="Fig1a_CLR", max_iter=10000, lr=0.1, lr_update_scheme="triangular", options=options)
 
-    TrainModel(min_lr=0.1, max_lr=3.0, stepsize=5000, max_iter=10000, name="Fig1a")
+    options = {
+        "steps" : [50000, 70000],
+        "gamma" : 0.1
+    }
+
+    TrainModel(name="Fig1a_Multi", max_iter=80000, lr=0.35, lr_update_scheme="multistep", options=options)
