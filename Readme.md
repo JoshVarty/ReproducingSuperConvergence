@@ -20,8 +20,8 @@ Independent evidence of super-convergence is demonstrated below:
     <img src="https://i.imgur.com/e9RXHl1.png" width="350" />
     <img src="https://i.imgur.com/PGZ9nlI.png" width="350" />
     <p align='center'>
-        <strong>Left: </strong>Test accuracy after 10,000 steps with &nbsp;&nbsp;&nbsp;&nbsp;
-        <strong>Right: </strong>Test accuracy after 80,000 steps with multistep learning.
+        <strong>Left: </strong>Test accuracy after 10,000 steps with CLR &nbsp;&nbsp;&nbsp;&nbsp;
+        <strong>Right: </strong>Test accuracy after 80,000 steps with multistep.
     </p>
 </p>
 
@@ -41,3 +41,4 @@ The Tensorflow implementation in based on the ResNet-56 architecture described i
  - While training, images are flipped left-to-right with 50% probability
  - All weights before ReLUs are initialized according to [Delving Deep into Rectifiers](https://arxiv.org/pdf/1502.01852v1.pdf). See: [`variance_scaling_initializer`](https://www.tensorflow.org/api_docs/python/tf/contrib/layers/variance_scaling_initializer)
  - All weights before softmax are initialized according to [Understanding the difficulty of training deep feedforward neural networks](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.207.2059&rep=rep1&type=pdf). See: [`xavier_initializer`](https://www.tensorflow.org/api_docs/python/tf/contrib/layers/xavier_initializer)
+ - Bias variables are initialized to zero.
