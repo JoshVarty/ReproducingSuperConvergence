@@ -9,16 +9,19 @@ than is used with standard training methods"*.
 Figure 1A demonstrates the phenomenon below:
 
 <p align="center"><img src="https://i.imgur.com/JQ8lHHA.png" width="400" /></p>
-<center>Cyclical Learning Rate (CLR) allows for competitive training in just 10,000 training steps.</center>
+<p align="center">Cyclical Learning Rate (CLR) allows for competitive training in just 10,000 training steps.</->
 
+### Reproduction
+<p>
 Independent evidence of super-convergence is demonstrated below:
+<p>
 
 <p align="center">
     <img src="https://i.imgur.com/e9RXHl1.png" width="350" />
     <img src="https://i.imgur.com/PGZ9nlI.png" width="350" />
     <p align='center'>
-        <strong>Left: </strong>Test accuracy after 10,000 steps with CLR.&nbsp;&nbsp;
-        <strong>Right: </strong>Test accuracy after 80,000 steps with multistep.
+        <strong>Left: </strong>Test accuracy after 10,000 steps with &nbsp;&nbsp;&nbsp;&nbsp;
+        <strong>Right: </strong>Test accuracy after 80,000 steps with multistep learning.
     </p>
 </p>
 
