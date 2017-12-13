@@ -16,8 +16,10 @@ Independent evidence of super-convergence is demonstrated below:
 <p align="center">
     <img src="https://i.imgur.com/e9RXHl1.png" width="350" />
     <img src="https://i.imgur.com/PGZ9nlI.png" width="350" />
-    <p><strong>Left: </strong>Test accuracy after 10,000 steps with CLR.</p>
-    <p><strong>Right: </strong>Test accuracy after 80,000 steps with multistep.</p>
+    <p align='center'>
+        <strong>Left: </strong>Test accuracy after 10,000 steps with CLR.&nbsp;&nbsp;
+        <strong>Right: </strong>Test accuracy after 80,000 steps with multistep.
+    </p>
 </p>
 
 In the above images:
