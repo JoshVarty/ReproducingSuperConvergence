@@ -13,7 +13,7 @@ Figure 1A demonstrates the phenomenon below:
 
 ### Reproduction
 <p>
-Weak evidence of super-convergence is demonstrated below:
+Weaker evidence of super-convergence is demonstrated below:
 <p>
 
 <p align="center">
@@ -28,6 +28,7 @@ Weak evidence of super-convergence is demonstrated below:
 In the above images:
  - A Cyclical Learning Rate allows for a test accuracy of ~85% after 10,000 training steps.
  - A multistep learning rate allows for a test accuracy ofr ~80% after 20,000 training steps. Progress is not made in steps 60,000 to 80,000.
+ - Accuracies above 90% were unable to be achieved. This may be related to the small mini-batch sizes used (125) compared to the author's (1,000).
 
 
 ### Architecture
