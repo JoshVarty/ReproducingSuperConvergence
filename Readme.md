@@ -13,7 +13,7 @@ Figure 1A demonstrates the phenomenon below:
 
 ### Reproduction
 <p>
-Independent evidence of super-convergence is demonstrated below:
+Weak evidence of super-convergence is demonstrated below:
 <p>
 
 <p align="center">
@@ -27,7 +27,7 @@ Independent evidence of super-convergence is demonstrated below:
 
 In the above images:
  - A Cyclical Learning Rate allows for a test accuracy of ~85% after 10,000 training steps.
- - A multistep learning rate allows for a test accuracy ofr ~80% after 80,000 training steps.
+ - A multistep learning rate allows for a test accuracy ofr ~80% after 20,000 training steps. Progress is not made in steps 60,000 to 80,000.
 
 
 ### Architecture
@@ -42,3 +42,20 @@ The Tensorflow implementation in based on the ResNet-56 architecture described i
  - All weights before ReLUs are initialized according to [Delving Deep into Rectifiers](https://arxiv.org/pdf/1502.01852v1.pdf). See: [`variance_scaling_initializer`](https://www.tensorflow.org/api_docs/python/tf/contrib/layers/variance_scaling_initializer)
  - All weights before softmax are initialized according to [Understanding the difficulty of training deep feedforward neural networks](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.207.2059&rep=rep1&type=pdf). See: [`xavier_initializer`](https://www.tensorflow.org/api_docs/python/tf/contrib/layers/xavier_initializer)
  - Bias variables are initialized to zero.
+
+
+## Appendix
+
+The learning rate, train accuracy and train loss for 10,000 training steps with a cyclical learning rate are shown below:
+
+
+<p align='center'>
+    <img src="https://i.imgur.com/ZUrTrIM.png" width="750" />
+</p>
+
+The learning rate, train accuracy and train loss for 80,000 training steps with a multistep learning rate are shown below:
+
+
+<p align='center'>
+    <img src="https://i.imgur.com/sZ39xBK.png" width="750" />
+</p>
